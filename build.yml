@@ -1,0 +1,40 @@
+name: Build Mac App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ffmpeg and node
+        run: brew install ffmpeg node
+
+      - name: Install Python deps
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install yt-dlp curl_cffi pyinstaller
+
+      - name: Build .app
+        run: |
+          python3 -m PyInstaller --onefile --windowed \
+            --name "YouTubeDownloader" \
+            --add-data "/opt/homebrew/bin/ffmpeg:." \
+            --add-data "/opt/homebrew/bin/ffprobe:." \
+            --add-data "$(which node):." \
+            --collect-all curl_cffi \
+            "YouTube下载器_mac.py"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: YouTubeDownloader-Mac
+          path: dist/YouTubeDownloader.app
