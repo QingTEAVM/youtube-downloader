@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  body { width: 280px; margin: 0; font-family: "Microsoft YaHei", sans-serif; background: #f8f9fa; }
+  .head { background: #ff0000; color: #fff; padding: 10px 14px; font-size: 15px; font-weight: bold; }
+  .body { padding: 12px 14px; }
+  .title { font-size: 13px; color: #333; margin: 0 0 10px; word-break: break-all; line-height: 1.5; max-height: 60px; overflow: hidden; }
+  .url { font-size: 11px; color: #999; margin: 6px 0 12px; word-break: break-all; }
+  .btn { display: block; width: 100%; padding: 10px; border: none; border-radius: 6px;
+         font-size: 14px; cursor: pointer; color: #fff; }
+  .btn-main { background: #ff0000; margin-bottom: 8px; }
+  .btn-main:hover { background: #e60000; }
+  .btn-open { background: #4285f4; }
+  .btn-open:hover { background: #3a77dd; }
+  .hint { font-size: 11px; color: #888; margin-top: 10px; line-height: 1.6; }
+  .bad { color: #999; text-align: center; padding: 16px; }
+  .bad .big { font-size: 15px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+  <div class="head">YouTube 下载助手</div>
+  <div class="body" id="content">
+    <div class="bad" id="bad">
+      <div class="big">当前不是 YouTube 视频页</div>
+      <div>请先打开一个 YouTube 视频，<br>再点击本图标</div>
+    </div>
+  </div>
+<script src="popup.js"></script>
+</body>
+</html>

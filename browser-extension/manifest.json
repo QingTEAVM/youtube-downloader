@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube 下载助手",
+  "version": "1.3",
+  "description": "在 YouTube 视频页右下角显示「⬇ 下载」按钮，自动把实时登录 Cookie 和视频链接发给本地「YouTube 下载器」，无需手动导出 Cookie、无需关闭浏览器（需电脑上已运行该下载器）",
+  "permissions": ["tabs", "activeTab", "cookies"],
+  "host_permissions": ["https://*.youtube.com/*", "https://youtube.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*", "http://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube 下载助手",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

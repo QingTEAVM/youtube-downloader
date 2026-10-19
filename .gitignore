@@ -1,0 +1,21 @@
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# PyInstaller 构建产物
+build/
+dist/
+*.spec
+
+# Windows 成品与大文件（Mac 仓库不需要）
+*.exe
+*.ico
+
+# 本地登录态，严禁上传
+cookies.txt
+_browser_cookies.txt
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
