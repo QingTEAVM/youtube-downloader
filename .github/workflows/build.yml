@@ -8,7 +8,18 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14      # Apple Silicon (M1/M2/M3/M4) arm64
+            arch: arm64
+            artifact: YouTubeDownloader-Mac-arm64
+          - runner: macos-13      # Intel 芯片 x86_64
+            arch: x86_64
+            artifact: YouTubeDownloader-Mac-Intel
+    runs-on: ${{ matrix.runner }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,29 +27,36 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install ffmpeg and node
-        run: brew install ffmpeg node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install Python deps
         run: |
           python3 -m pip install --upgrade pip
           pip3 install yt-dlp curl_cffi pyinstaller
 
-      - name: Locate toolchain paths
-        id: tools
+      - name: Fetch static ffmpeg / ffprobe (no external libs)
+        id: ff
         run: |
-          echo "ffmpeg=$(which ffmpeg)" >> "$GITHUB_OUTPUT"
-          echo "ffprobe=$(which ffprobe)" >> "$GITHUB_OUTPUT"
+          npm install ffmpeg-static @ffprobe-installer/ffprobe >/dev/null 2>&1
+          FFMPEG=$(node -e "console.log(require('ffmpeg-static'))")
+          FFPROBE=$(node -e "console.log(require('@ffprobe-installer/ffprobe').path)")
+          chmod +x "$FFMPEG" "$FFPROBE"
+          echo "ffmpeg=$FFMPEG" >> "$GITHUB_OUTPUT"
+          echo "ffprobe=$FFPROBE" >> "$GITHUB_OUTPUT"
           echo "node=$(which node)" >> "$GITHUB_OUTPUT"
+          echo "使用静态 ffmpeg: $FFMPEG"
+          echo "使用静态 ffprobe: $FFPROBE"
 
-      - name: Build .app
+      - name: Build .app (${{ matrix.arch }})
         run: |
           python3 -m PyInstaller --onefile --windowed \
             --name "YouTubeDownloader" \
             --icon "app.icns" \
-            --add-data "${{ steps.tools.outputs.ffmpeg }}:." \
-            --add-data "${{ steps.tools.outputs.ffprobe }}:." \
-            --add-data "${{ steps.tools.outputs.node }}:." \
+            --add-data "${{ steps.ff.outputs.ffmpeg }}:." \
+            --add-data "${{ steps.ff.outputs.ffprobe }}:." \
+            --add-data "${{ steps.ff.outputs.node }}:." \
             --add-data "叮一声，完成提示.mp3:." \
             --add-data "browser-extension:browser-extension" \
             --collect-all curl_cffi \
@@ -50,10 +68,10 @@ jobs:
           cp -R "dist/YouTubeDownloader.app" release/
           cp -R "browser-extension" release/browser-extension
           cp "Mac版使用说明.txt" release/
-          cd release && zip -r "../YouTubeDownloader-Mac.zip" .
+          cd release && zip -r "../${{ matrix.artifact }}.zip" .
 
-      - name: Upload artifact
+      - name: Upload artifact (${{ matrix.arch }})
         uses: actions/upload-artifact@v4
         with:
-          name: YouTubeDownloader-Mac
-          path: YouTubeDownloader-Mac.zip
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
